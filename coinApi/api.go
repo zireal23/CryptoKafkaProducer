@@ -23,7 +23,7 @@ func UnmarshalCoinAPI(data []byte) (CoinAPI, error) {
 func (r *CoinAPI) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
-
+//The structs defined to convert the json response from the API to usable golang types
 type CoinAPI struct {
 	Coins []Coin `json:"data"`
 }
@@ -44,7 +44,10 @@ type Coin struct {
 }
 
 
-
+/*
+* Queries the API and converts the json response.
+* Sends back the array of coin data (100 coins in total) to the calling function
+*/
 func GetAllCoins() []Coin {
 	url := "https://api.coincap.io/v2/assets";
 
