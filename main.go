@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/joho/godotenv"
 	"github.com/zirael23/CryptoKafkaProducer/coinApi"
 	kafkaSchemapb "github.com/zirael23/CryptoKafkaProducer/kafkaSchema"
 	"google.golang.org/protobuf/proto"
@@ -17,20 +16,20 @@ import (
 /*
 * The entry point of the application.
 * Loading the configurations from the enviroment variables.
-* Also initilaising the kafka producer API. 
-*/
+* Also initilaising the kafka producer API.
+ */
 
 func main(){
-	if(os.Getenv("GO_ENV")!="production"){
-	err := godotenv.Load();
+// 	if(os.Getenv("GO_ENV")!="production"){
+// 	err := godotenv.Load();
 
-	if err != nil {
-		log.Println("Error while loading env file", err.Error());
-	}
-}
+// 	if err != nil {
+// 		log.Println("Error while loading env file", err.Error());
+// 	}
+// }
 	
 	//create a new producer
-	
+	fmt.Println(os.Getenv("SASLMECHANISM"));
 	producer, err := initialiseKafkaProducer();
 	if err != nil {
 		log.Println("Error while initialising producer: ", err.Error());
@@ -64,6 +63,7 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 	saslUserName := os.Getenv("SASLUSER");
 	saslPassword := os.Getenv("SASLPASSWORD");
 	clientID := os.Getenv("CLIENTID");
+
 	config.Net.SASL.Enable = true;
 	config.Net.TLS.Enable = true;
 	config.Net.SASL.Mechanism = sarama.SASLMechanism(saslMechanism);
@@ -96,7 +96,7 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 		if err == nil {
 			break;
 		}
-		log.Println("Couldnt connect to kafka, Retrying....");
+		log.Println("Couldnt connect to kafka, Retrying....", err.Error());
 		time.Sleep(time.Second*10);
 	}
 
