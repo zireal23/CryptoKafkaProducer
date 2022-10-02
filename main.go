@@ -58,20 +58,18 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 	sarama.Logger = log.New(os.Stdout, "", log.Ltime);
 
 	//producer config
-	// kafkaConnectionURL := os.Getenv("kafkaConnectionURL");
-	// saslMechanism := os.Getenv("SASLMECHANISM");
-	// saslUserName := os.Getenv("SASLUSER");
-	// saslPassword := os.Getenv("SASLPASSWORD");
-	// clientID := os.Getenv("CLIENTID");
-	// config.Net.SASL.Enable = true;
-	// config.Net.TLS.Enable = true;
-	// config.Net.SASL.Mechanism = sarama.SASLMechanism(saslMechanism);
-	// config.Net.SASL.User = saslUserName;
-	// config.Net.SASL.Password = saslPassword;
-	// config.ClientID = clientID;
-
-
 	config := sarama.NewConfig();
+	kafkaConnectionURL := os.Getenv("kafkaConnectionURL");
+	saslMechanism := os.Getenv("SASLMECHANISM");
+	saslUserName := os.Getenv("SASLUSER");
+	saslPassword := os.Getenv("SASLPASSWORD");
+	clientID := os.Getenv("CLIENTID");
+	config.Net.SASL.Enable = true;
+	config.Net.TLS.Enable = true;
+	config.Net.SASL.Mechanism = sarama.SASLMechanism(saslMechanism);
+	config.Net.SASL.User = saslUserName;
+	config.Net.SASL.Password = saslPassword;
+	config.ClientID = clientID;
 	//Max number of retries while pushing message to kafka
 	config.Producer.Retry.Max = 5;
 	// The maximum duration the broker will wait the receipt of the number of
@@ -82,9 +80,6 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 	config.Producer.RequiredAcks = sarama.WaitForAll;
 	//If enabled, successfully delivered messages will be returned on the Successes channel (default disabled).
 	config.Producer.Return.Successes = true;
-	//Id to uniquely identify the producer.
-	//TODO:Change later to something unique incase of multiple producers.
-	config.ClientID = "crypto_producer";
 
 	//async producer 
 	// prd, err := sarama.NewAsyncProducer([]string{kafkaConn}, config);
@@ -94,7 +89,8 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 
 	var producer sarama.SyncProducer;
 	var err error;
-	kafkaConnectionURL := os.Getenv("KAFKA_CONNECTION");
+	//Commented because this one is used for docker kafka
+	//kafkaConnectionURL := os.Getenv("KAFKA_CONNECTION");
 	for{
 		producer, err = sarama.NewSyncProducer([]string{kafkaConnectionURL}, config);
 		if err == nil {
@@ -115,15 +111,15 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 
 func queryAPIandPublishMessage(producer sarama.SyncProducer){
 	//FIXME: Delete later when benchmarking is completed
-	startTime := time.Now();
+	//startTime := time.Now();
 	for {
 		coins := coinApi.GetAllCoins();
 		for _, currentCoin  := range coins{
 			kafkaMessage := createMessageFormat(currentCoin);
 			publishMessage(kafkaMessage, producer,currentCoin);
-			time.Sleep(time.Millisecond* 100);
+			//time.Sleep(time.Millisecond* 100);
 		}
-		log.Println("The entire process took: ",time.Since(startTime).Seconds());
+		//log.Println("The entire process took: ",time.Since(startTime).Seconds());
 	}
 
 }
