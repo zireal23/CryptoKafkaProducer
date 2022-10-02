@@ -97,6 +97,7 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 			break;
 		}
 		log.Println("Couldnt connect to kafka, Retrying....");
+		time.Sleep(time.Second*10);
 	}
 
 	return producer, err;
@@ -111,15 +112,15 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 
 func queryAPIandPublishMessage(producer sarama.SyncProducer){
 	//FIXME: Delete later when benchmarking is completed
-	//startTime := time.Now();
+	startTime := time.Now();
 	for {
 		coins := coinApi.GetAllCoins();
 		for _, currentCoin  := range coins{
 			kafkaMessage := createMessageFormat(currentCoin);
 			publishMessage(kafkaMessage, producer,currentCoin);
-			//time.Sleep(time.Millisecond* 100);
+			time.Sleep(time.Millisecond* 100);
 		}
-		//log.Println("The entire process took: ",time.Since(startTime).Seconds());
+		log.Println("The entire process took: ",time.Since(startTime).Seconds());
 	}
 
 }
