@@ -144,6 +144,7 @@ func createMessageFormat(coinData coinApi.Coin) []byte {
 		Name: coinData.Name,
 		Price: float32(coinPrice),
 		Timestamp: time.Now().Unix(),
+		
 	}
 	//Convertig the message to a byet slice/array.
 	kafkaMessage, err := proto.Marshal(message);
