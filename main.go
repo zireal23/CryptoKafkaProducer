@@ -118,7 +118,7 @@ func queryAPIandPublishMessage(producer sarama.SyncProducer){
 		for _, currentCoin  := range coins{
 			kafkaMessage := createMessageFormat(currentCoin);
 			publishMessage(kafkaMessage, producer,currentCoin);
-			time.Sleep(time.Millisecond* 100);
+			time.Sleep(time.Millisecond* 10);
 		}
 		log.Println("The entire process took: ",time.Since(startTime).Seconds());
 	}
