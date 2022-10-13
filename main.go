@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/joho/godotenv"
 	"github.com/zirael23/CryptoKafkaProducer/coinApi"
 	kafkaSchemapb "github.com/zirael23/CryptoKafkaProducer/kafkaSchema"
 	"google.golang.org/protobuf/proto"
@@ -20,13 +21,13 @@ import (
  */
 
 func main(){
-// 	if(os.Getenv("GO_ENV")!="production"){
-// 	err := godotenv.Load();
+	if(os.Getenv("GO_ENV")!="production"){
+	err := godotenv.Load();
 
-// 	if err != nil {
-// 		log.Println("Error while loading env file", err.Error());
-// 	}
-// }
+	if err != nil {
+		log.Println("Error while loading env file", err.Error());
+	}
+}
 	
 	//create a new producer
 	fmt.Println(os.Getenv("SASLMECHANISM"));
@@ -112,13 +113,13 @@ func initialiseKafkaProducer() (sarama.SyncProducer, error){
 
 func queryAPIandPublishMessage(producer sarama.SyncProducer){
 	//FIXME: Delete later when benchmarking is completed
-	startTime := time.Now();
 	for {
+		startTime := time.Now();
 		coins := coinApi.GetAllCoins();
 		for _, currentCoin  := range coins{
 			kafkaMessage := createMessageFormat(currentCoin);
 			publishMessage(kafkaMessage, producer,currentCoin);
-			time.Sleep(time.Millisecond* 10);
+			//time.Sleep(time.Millisecond* 10);
 		}
 		log.Println("The entire process took: ",time.Since(startTime).Seconds());
 	}
@@ -176,8 +177,8 @@ func publishMessage(message []byte, producer sarama.SyncProducer, coin coinApi.C
 	if err != nil {
 		log.Println("Error pushing message to Kafka", err.Error());
 	}
-
-	fmt.Println("Message pushed to partition: ", messagePartition);
-	fmt.Println("Message pushed to offset: ", messageOffset);
+	log.Println("Message pushed to partition: ", messagePartition, " and offset: ", messageOffset);
+	//fmt.Println("Message pushed to partition: ", messagePartition);
+	//fmt.Println("Message pushed to offset: ", messageOffset);
 
 }
